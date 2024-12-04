@@ -7,7 +7,7 @@ const lineChartOptions: LineChartOptions = {
       mapsTo: "value",
     },
     bottom: {
-      scaleType: ScaleTypes.TIME, // Use the enum if applicable
+      scaleType: ScaleTypes.TIME,
       mapsTo: "date",
     },
   },

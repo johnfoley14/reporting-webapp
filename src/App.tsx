@@ -1,7 +1,26 @@
-import DataDashboard from "./Dashboard";
+import DataDashboard from "./lib/Dashboard";
 import "./App.css";
+import { useState, useEffect } from "react";
+import { getDeviceMetadata } from "./store/DeviceData";
+import { Loading } from "@carbon/react";
 
 function App() {
+  const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDevices = async () => {
+      try {
+        const deviceData = await getDeviceMetadata();
+        setDevices(deviceData); // Update state with the fetched data
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+      }
+    };
+
+    fetchDevices();
+  }, []);
+
   return (
     <div
       style={{
@@ -11,15 +30,7 @@ function App() {
         paddingBottom: "2%",
       }}
     >
-      <div
-        style={{
-          border: "3px solid #2d6bcf",
-          borderRadius: "10px",
-          backgroundColor: "white",
-        }}
-      >
-        <DataDashboard />
-      </div>
+      {loading ? <Loading /> : <DataDashboard />}
     </div>
   );
 }
