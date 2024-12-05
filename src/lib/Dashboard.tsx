@@ -25,7 +25,6 @@ const DataDashboard: React.FC<DataDashboardProps> = ({ devices }) => {
           devices.map((device) => device.device_id)
         );
 
-        console.log("Device Data:", deviceData);
         // Transform data into a device-specific map
         const transformedData = deviceData.reduce((acc, item) => {
           // Initialize an array for this device_id if it doesn't exist
@@ -39,8 +38,6 @@ const DataDashboard: React.FC<DataDashboardProps> = ({ devices }) => {
 
           return acc;
         }, {} as Record<number, GraphFormData[]>);
-
-        console.log("Transformed Data:", transformedData);
 
         setDeviceDataMap(transformedData);
         setLoading(false);
