@@ -1,38 +1,101 @@
-import { LineChart, GaugeChart } from "@carbon/charts-react";
+import { LineChart } from "@carbon/charts-react";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@carbon/react";
 import "@carbon/charts-react/styles.css";
 import "@carbon/styles/index.scss";
-import data from "./Data";
-import { lineChartOptions, gaugeChartOptions } from "./Options";
+import { lineChartOptions } from "./Options";
+import { useEffect, useState } from "react";
+import { Loading } from "@carbon/react";
+import { getDeviceData, DeviceData, GraphFormData } from "../store/DeviceData";
+import { Device } from "../store/DeviceData";
 
-const DataDashboard = () => {
+interface DataDashboardProps {
+  devices: Device[];
+}
+
+const DataDashboard: React.FC<DataDashboardProps> = ({ devices }) => {
+  const [deviceDataMap, setDeviceDataMap] = useState<
+    Record<number, GraphFormData[]>
+  >({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDevicesData = async () => {
+      try {
+        const deviceData = await getDeviceData(
+          devices.map((device) => device.device_id)
+        );
+
+        console.log("Device Data:", deviceData);
+        // Transform data into a device-specific map
+        const transformedData = deviceData.reduce((acc, item) => {
+          // Initialize an array for this device_id if it doesn't exist
+          if (!acc[item.device_id]) {
+            acc[item.device_id] = [];
+          }
+
+          // Transform and append the metric values for this device_id
+          const transformedMetrics = transformData([item]);
+          acc[item.device_id] = [...acc[item.device_id], ...transformedMetrics];
+
+          return acc;
+        }, {} as Record<number, GraphFormData[]>);
+
+        console.log("Transformed Data:", transformedData);
+
+        setDeviceDataMap(transformedData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+      }
+    };
+
+    fetchDevicesData();
+  }, [devices]);
+
   return (
-    <div
-      style={{
-        border: "3px solid #2d6bcf",
-        borderRadius: "10px",
-        backgroundColor: "white",
-      }}
-    >
-      <div style={{ margin: "3%", maxHeight: "60%" }}>
-        <Tabs onTabCloseRequest={() => {}}>
-          <TabList aria-label="List of tabs">
-            <Tab>Device One</Tab>
-            <Tab>Monitoring</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <LineChart data={data} options={lineChartOptions}></LineChart>
-              <GaugeChart
-                data={[{ group: "value", value: 50 }]}
-                options={gaugeChartOptions}
-              ></GaugeChart>
-            </TabPanel>
-            <TabPanel>Tab Panel 2</TabPanel>
-          </TabPanels>
-        </Tabs>
-      </div>
+    <div>
+      {loading ? (
+        <Loading />
+      ) : (
+        <div
+          style={{
+            border: "3px solid #2d6bcf",
+            borderRadius: "10px",
+            backgroundColor: "white",
+          }}
+        >
+          <div style={{ margin: "3%", maxHeight: "60%" }}>
+            <Tabs>
+              <TabList aria-label="List of tabs">
+                {devices.map((device) => (
+                  <Tab key={device.device_id}>{device.device_name}</Tab>
+                ))}
+              </TabList>
+              <TabPanels>
+                {devices.map((device) => (
+                  <TabPanel key={device.device_id}>
+                    <LineChart
+                      data={deviceDataMap[device.device_id] || []}
+                      options={lineChartOptions}
+                    />
+                  </TabPanel>
+                ))}
+              </TabPanels>
+            </Tabs>
+          </div>
+        </div>
+      )}
     </div>
+  );
+};
+
+const transformData = (data: DeviceData[]): GraphFormData[] => {
+  return data.flatMap((item) =>
+    item.metric_values.map((metric) => ({
+      group: item.metric_name,
+      collected_timestamp: metric.collected_timestamp,
+      metric_value: metric.metric_value,
+    }))
   );
 };
 

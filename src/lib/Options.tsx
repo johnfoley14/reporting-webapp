@@ -1,14 +1,14 @@
 import { ScaleTypes, LineChartOptions } from "@carbon/charts/interfaces";
 
 const lineChartOptions: LineChartOptions = {
-  title: "Device Data",
+  title: "Device Metrics",
   axes: {
     left: {
-      mapsTo: "value",
+      mapsTo: "metric_value",
     },
     bottom: {
       scaleType: ScaleTypes.TIME,
-      mapsTo: "date",
+      mapsTo: "collected_timestamp",
     },
   },
   legend: {

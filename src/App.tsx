@@ -3,21 +3,22 @@ import "./App.css";
 import { useState, useEffect } from "react";
 import { getDeviceMetadata } from "./store/DeviceData";
 import { Loading } from "@carbon/react";
+import { Device } from "./store/DeviceData";
 
 function App() {
-  const [devices, setDevices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchDevices = async () => {
       try {
         const deviceData = await getDeviceMetadata();
         setDevices(deviceData); // Update state with the fetched data
+        setLoading(false); // Set loading to false
       } catch (error) {
         console.error("Error fetching devices:", error);
       }
     };
-
     fetchDevices();
   }, []);
 
@@ -30,7 +31,7 @@ function App() {
         paddingBottom: "2%",
       }}
     >
-      {loading ? <Loading /> : <DataDashboard />}
+      {loading ? <Loading /> : <DataDashboard devices={devices} />}
     </div>
   );
 }
