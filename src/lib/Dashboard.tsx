@@ -1,11 +1,16 @@
 import { LineChart } from "@carbon/charts-react";
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@carbon/react";
+import { Tabs, TabList, Tab, TabPanels, TabPanel, Button } from "@carbon/react";
 import "@carbon/charts-react/styles.css";
 import "@carbon/styles/index.scss";
 import { lineChartOptions } from "./Options";
 import { useEffect, useState } from "react";
 import { Loading } from "@carbon/react";
-import { getDeviceData, DeviceData, GraphFormData } from "../store/DeviceData";
+import {
+  getDeviceData,
+  DeviceData,
+  GraphFormData,
+  manageCollection,
+} from "../store/DeviceData";
 import { Device } from "../store/DeviceData";
 
 interface DataDashboardProps {
@@ -75,6 +80,34 @@ const DataDashboard: React.FC<DataDashboardProps> = ({ devices }) => {
                       data={deviceDataMap[device.device_id] || []}
                       options={lineChartOptions}
                     />
+                    <div
+                      style={{ display: "flex", gap: "10px", padding: "20px" }}
+                    >
+                      <Button
+                        kind="tertiary"
+                        onClick={() =>
+                          manageCollection(
+                            "START",
+                            device.aggregator_id,
+                            device.device_id
+                          )
+                        }
+                      >
+                        Start collecting data for {device.device_name}
+                      </Button>
+                      <Button
+                        kind="danger--tertiary"
+                        onClick={() =>
+                          manageCollection(
+                            "STOP",
+                            device.aggregator_id,
+                            device.device_id
+                          )
+                        }
+                      >
+                        Stop collecting data for {device.device_name}
+                      </Button>
+                    </div>
                   </TabPanel>
                 ))}
               </TabPanels>

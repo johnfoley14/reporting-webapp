@@ -49,3 +49,23 @@ export const getDeviceData = async (
     throw error; // Rethrow the error to handle it in the calling code if needed
   }
 };
+
+export const manageCollection = async (
+  instruction: string,
+  agg_id: number,
+  device_id: number
+): Promise<void> => {
+  try {
+    console.log("sent instruction: ", instruction);
+    console.log("agg id: ", agg_id);
+    console.log("device id: ", device_id);
+    await axios.post(`${config.backendUrl}/manage_collection`, {
+      instruction,
+      agg_id,
+      device_id,
+    });
+  } catch (error) {
+    console.error("Error managing collection:", error);
+    throw error; // Rethrow the error to handle it in the calling code if needed
+  }
+};
