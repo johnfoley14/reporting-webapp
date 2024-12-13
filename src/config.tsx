@@ -1,3 +1,5 @@
-const config = { backendUrl: "http://localhost:5001" };
+const config = {
+  backendUrl: "https://johnfoley14.pythonanywhere.com/",
+};
 
 export { config };
